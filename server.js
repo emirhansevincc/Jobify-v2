@@ -4,9 +4,6 @@ dotenv.config();
 import express from "express";
 import morgan from "morgan";
 import mongoose from "mongoose";
-import { body, validationResult } from "express-validator";
-
-import { validateTest } from "./middleware/validationMiddleware.js";
 
 // Routers
 import jobRouter from "./routes/jobRouter.js";
@@ -24,11 +21,6 @@ if (process.env.NODE_ENV === "development") {
 app.get("/", (req, res) => {
     res.send("Hello World");
 });
-
-app.post("/api/v1/test", validateTest, (req, res) => {
-    const { name } = req.body;
-    res.json(`Hello ${name}`);
-})
 
 app.use("/api/v1/jobs", jobRouter);
 
