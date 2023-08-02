@@ -14,3 +14,8 @@ export const action = async ({ params }) => {
 };
 
 // NO JSX HERE
+const DeleteJob = () => {
+  return null;
+};
+
+export default DeleteJob;
