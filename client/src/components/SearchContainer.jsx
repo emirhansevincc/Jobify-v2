@@ -9,6 +9,17 @@ const SearchContainer = () => {
   const { search, jobStatus, jobType, sort } = searchValues;
   const submit = useSubmit();
 
+  const debounce = (onChange) => {
+    let timeout;
+    return (e) => {
+      const form = e.currentTarget.form;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        onChange(form);
+      }, 2000);
+    };
+  };
+
   return (
     <Wrapper>
       {/* We didn't use method="post" like previous forms because we don't want to send data to the server if you dont use a method name, it going to be a get request by default and add query params to the url */}
@@ -21,9 +32,9 @@ const SearchContainer = () => {
             type="search"
             name="search"
             defaultValue={search}
-            onChange={(e) => {
-              submit(e.currentTarget.form);
-            }}
+            onChange={debounce((form) => {
+              submit(form);
+            })}
           />
           <FormRowSelect
             labelText="job status"
