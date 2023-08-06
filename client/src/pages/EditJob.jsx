@@ -16,19 +16,22 @@ export const loader = async ({ params }) => {
     return redirect("/dashboard/all-jobs");
   }
 };
-export const action = async ({ request, params }) => {
-  const formData = await request.formData();
-  const data = Object.fromEntries(formData);
+export const action =
+  (queryClient) =>
+  async ({ request, params }) => {
+    const formData = await request.formData();
+    const data = Object.fromEntries(formData);
 
-  try {
-    await customFetch.patch(`/jobs/${params.id}`, data);
-    toast.success("Job edited successfully");
-    return redirect("/dashboard/all-jobs");
-  } catch (error) {
-    toast.error(error.response.data.msg);
-    return error;
-  }
-};
+    try {
+      await customFetch.patch(`/jobs/${params.id}`, data);
+      queryClient.invalidateQueries(["jobs"]);
+      toast.success("Job edited successfully");
+      return redirect("/dashboard/all-jobs");
+    } catch (error) {
+      toast.error(error.response.data.msg);
+      return error;
+    }
+  };
 
 // if you want to use params in here you should use useParams hook
 const EditJob = () => {
