@@ -7,6 +7,10 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cloudinary from "cloudinary";
 
+// Security
+import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
+
 // Routers
 import jobRouter from "./routes/jobRouter.js";
 import authRouter from "./routes/authRouter.js";
@@ -25,6 +29,9 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 
+app.use(helmet());
+app.use(mongoSanitize());
+
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.CLOUD_API_KEY,
@@ -36,14 +43,6 @@ if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));
 }
 app.use(express.static(path.resolve(__dirname, "./client/dist")));
-
-app.get("/", (req, res) => {
-    res.send("Hello World");
-});
-
-app.get("/api/v1/test", (req, res) => {
-    res.json({ msg: "test route" });
-});
 
 app.use("/api/v1/jobs", authenticateUser, jobRouter);
 app.use("/api/v1/users", authenticateUser, userRouter);
