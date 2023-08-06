@@ -5,17 +5,29 @@ import { JOB_STATUS, JOB_TYPE } from "../../../utils/constants";
 import { Form, redirect } from "react-router-dom";
 import { toast } from "react-toastify";
 import customFetch from "../utils/customFetch";
+import { useQuery } from "@tanstack/react-query";
 
-export const loader = async ({ params }) => {
-  try {
-    // if you write params on console : {id: '64ca03740df2604f239cc102'}
-    const { data } = await customFetch.get(`/jobs/${params.id}`);
-    return data;
-  } catch (error) {
-    toast.error(error.response.data.msg);
-    return redirect("/dashboard/all-jobs");
-  }
+const singleJobQuery = (id) => {
+  return {
+    queryKey: ["job", id],
+    queryFn: async () => {
+      const { data } = await customFetch.get(`/jobs/${id}`);
+      return data;
+    },
+  };
 };
+
+export const loader =
+  (queryClient) =>
+  async ({ params }) => {
+    try {
+      await queryClient.ensureQueryData(singleJobQuery(params.id));
+      return params.id;
+    } catch (error) {
+      toast.error(error.response.data.msg);
+      return redirect("/dashboard/all-jobs");
+    }
+  };
 export const action =
   (queryClient) =>
   async ({ request, params }) => {
@@ -35,7 +47,8 @@ export const action =
 
 // if you want to use params in here you should use useParams hook
 const EditJob = () => {
-  const { job } = useLoaderData();
+  const id = useLoaderData();
+  const { data: job } = useQuery(singleJobQuery(id));
 
   return (
     <Wrapper>
